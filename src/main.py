@@ -52,6 +52,12 @@ def loadScript():
     return chose
 
 if __name__ == "__main__":
-    scriptPath = './scripts/Exp/Spiraria.txt' # loadScript()
+    # Cambia esta ruta para usar otro script:
+    # Route 3 desde Striaton City (gym 1 completado, sin HMs):
+    scriptPath = './scripts/Exp/Route3_Striaton.txt'
+    # Route 2 desde Accumula Town (inicio del juego):
+    # scriptPath = './scripts/Exp/Route2_EarlyUnova.txt'
+    # Spiraria (requiere HM Surf, mid-late game):
+    # scriptPath = './scripts/Exp/Spiraria.txt'
     alphaForny = AlphaForny(scriptPath, t, clear)
     alphaForny.start()

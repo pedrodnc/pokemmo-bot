@@ -1,2 +1,21 @@
 [ general ]
 STARTDIR = "./"
+
+[ bot ]
+# Script activo al ejecutar python src/main.py
+# Opciones:
+#   ./scripts/Exp/Route3_Striaton.txt     <- Ruta 3 desde Striaton (actual)
+#   ./scripts/Exp/Route2_EarlyUnova.txt   <- Ruta 2 desde Accumula
+#   ./scripts/Exp/Spiraria.txt            <- Spiraria (requiere Surf)
+SCRIPT = "./scripts/Exp/Route3_Striaton.txt"
+
+[ game ]
+# Resolucion del juego - NO cambiar, las refs estan calibradas para esto
+RESOLUTION_W = 1920
+RESOLUTION_H = 1080
+
+[ controls ]
+# Tecla de accion principal (A) - debe coincidir con la config del juego
+ACTION_KEY = "z"
+# Tecla Surf / HM (solo para script Spiraria)
+SURF_KEY = "j"
