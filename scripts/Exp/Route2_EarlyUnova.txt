@@ -1,0 +1,94 @@
+# Script: Route 2 / Early Unova Wild Encounter Farm
+# Requisitos:
+#   - Posicion inicial: parado encima del Centro Pokemon de Accumula Town
+#   - Resolucion: 1920x1080
+#   - Un Pokemon con un ataque rapido en posicion 1 del equipo
+#   - NO necesita HM Surf
+#
+# Flujo:
+#   setup -> ir al centro a curar
+#   loop  -> bajar a la hierba, caminar para provocar encuentros, ganar con spam Z, volver al centro
+
+setup:
+    PRINT iniciando_bot_espera_2_segundos
+    SLEEP 2
+    HOLD UP
+    WAITFOR center
+    SLEEP 1
+    RELEASE UP
+
+loop:
+    # Curar en el Centro Pokemon
+    SLEEP 0.5
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR yesno
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    SLEEP 1.5
+
+    # Salir del centro hacia la hierba (Route 2 esta al sur de Accumula)
+    HOLD DOWN
+    SLEEP 3.5
+    RELEASE DOWN
+    SLEEP 0.3
+
+    # Caminar en zigzag dentro de la hierba para provocar encuentros
+    HOLD RIGHT
+    SLEEP 1.5
+    RELEASE RIGHT
+    SLEEP 0.2
+
+    HOLD DOWN
+    SLEEP 1.0
+    RELEASE DOWN
+    SLEEP 0.2
+
+    HOLD LEFT
+    SLEEP 1.5
+    RELEASE LEFT
+    SLEEP 0.2
+
+    HOLD DOWN
+    SLEEP 1.0
+    RELEASE DOWN
+    SLEEP 0.2
+
+    HOLD RIGHT
+    SLEEP 1.5
+    RELEASE RIGHT
+    SLEEP 0.2
+
+    HOLD UP
+    SLEEP 1.0
+    RELEASE UP
+    SLEEP 0.2
+
+    HOLD LEFT
+    SLEEP 1.5
+    RELEASE LEFT
+    SLEEP 0.2
+
+    # Si hay batalla, ganarla con spam Z
+    WAITFOR lotta
+    PRESS Z
+    SLEEP 0.5
+    PRESS Z
+    SLEEP 0.5
+    PRESS Z
+    SPAM Z
+    WAITFOR terrain
+    STOPSPAM Z
+    SLEEP 0.5
+
+    # Volver al Centro Pokemon (subir)
+    HOLD UP
+    WAITFOR center
+    SLEEP 1
+    RELEASE UP

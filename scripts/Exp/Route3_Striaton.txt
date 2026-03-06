@@ -1,0 +1,109 @@
+# Script: Route 3 - Striaton City (Gym 1 completado)
+# Requisitos:
+#   - Posicion inicial: encima de la puerta del Centro Pokemon de Striaton City
+#   - Resolucion: 1920x1080, juego en ventana
+#   - Pokemon nivel ~15-20 con ataque rapido en posicion 1
+#   - NO necesita HMs
+#
+# Flujo:
+#   setup -> ir al centro a curar
+#   loop  -> salir a Route 3 (este), caminar en hierba, ganar batalla, volver al centro
+
+setup:
+    PRINT esperando_2_segundos
+    SLEEP 2
+    HOLD UP
+    WAITFOR center
+    SLEEP 1
+    RELEASE UP
+
+loop:
+    # Curar en el Centro Pokemon
+    SLEEP 0.5
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR yesno
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    WAITFOR arrow
+    PRESS Z
+    SLEEP 1.5
+
+    # Salir del centro y ir a Route 3 (al este de Striaton)
+    HOLD DOWN
+    SLEEP 1.0
+    RELEASE DOWN
+    SLEEP 0.3
+
+    HOLD RIGHT
+    SLEEP 4.0
+    RELEASE RIGHT
+    SLEEP 0.3
+
+    # Entrar en la hierba de Route 3 y hacer zigzag
+    HOLD RIGHT
+    SLEEP 1.0
+    RELEASE RIGHT
+    SLEEP 0.2
+
+    HOLD DOWN
+    SLEEP 0.8
+    RELEASE DOWN
+    SLEEP 0.2
+
+    HOLD RIGHT
+    SLEEP 1.0
+    RELEASE RIGHT
+    SLEEP 0.2
+
+    HOLD UP
+    SLEEP 0.8
+    RELEASE UP
+    SLEEP 0.2
+
+    HOLD RIGHT
+    SLEEP 1.0
+    RELEASE RIGHT
+    SLEEP 0.2
+
+    HOLD DOWN
+    SLEEP 0.8
+    RELEASE DOWN
+    SLEEP 0.2
+
+    HOLD LEFT
+    SLEEP 1.0
+    RELEASE LEFT
+    SLEEP 0.2
+
+    HOLD UP
+    SLEEP 0.8
+    RELEASE UP
+    SLEEP 0.2
+
+    # Ganar la batalla con spam Z
+    WAITFOR lotta
+    PRESS Z
+    SLEEP 0.5
+    PRESS Z
+    SLEEP 0.5
+    PRESS Z
+    SPAM Z
+    WAITFOR terrain
+    STOPSPAM Z
+    SLEEP 0.8
+
+    # Volver al Centro Pokemon de Striaton (al oeste)
+    HOLD LEFT
+    SLEEP 5.5
+    RELEASE LEFT
+    SLEEP 0.3
+
+    HOLD UP
+    WAITFOR center
+    SLEEP 1
+    RELEASE UP
