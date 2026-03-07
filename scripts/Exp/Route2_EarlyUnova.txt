@@ -6,8 +6,9 @@
 #   - NO necesita HM Surf
 #
 # Flujo:
-#   setup -> ir al centro a curar
-#   loop  -> bajar a la hierba, caminar para provocar encuentros, ganar con spam Z, volver al centro
+#   setup -> entrar al centro a curar
+#   loop  -> bajar a hierba, WALK hasta encuentro,
+#            ganar batalla (auto-detectada), volver al centro
 
 setup:
     PRINT iniciando_bot_espera_2_segundos
@@ -33,61 +34,23 @@ loop:
     PRESS Z
     SLEEP 1.5
 
-    # Salir del centro hacia la hierba (Route 2 esta al sur de Accumula)
+    # Salir del centro hacia la hierba (Route 2 al sur de Accumula)
     HOLD DOWN
     SLEEP 3.5
     RELEASE DOWN
     SLEEP 0.3
 
-    # Caminar en zigzag dentro de la hierba para provocar encuentros
-    HOLD RIGHT
-    SLEEP 1.5
-    RELEASE RIGHT
-    SLEEP 0.2
+    # Caminar en hierba con patron configurable
+    WALK zigzag
 
-    HOLD DOWN
-    SLEEP 1.0
-    RELEASE DOWN
-    SLEEP 0.2
-
-    HOLD LEFT
-    SLEEP 1.5
-    RELEASE LEFT
-    SLEEP 0.2
-
-    HOLD DOWN
-    SLEEP 1.0
-    RELEASE DOWN
-    SLEEP 0.2
-
-    HOLD RIGHT
-    SLEEP 1.5
-    RELEASE RIGHT
-    SLEEP 0.2
-
-    HOLD UP
-    SLEEP 1.0
-    RELEASE UP
-    SLEEP 0.2
-
-    HOLD LEFT
-    SLEEP 1.5
-    RELEASE LEFT
-    SLEEP 0.2
-
-    # Si hay batalla, ganarla con spam Z
+    # Si no hubo batalla durante el WALK, esperar una
     WAITFOR lotta
-    PRESS Z
-    SLEEP 0.5
-    PRESS Z
-    SLEEP 0.5
-    PRESS Z
     SPAM Z
     WAITFOR terrain
     STOPSPAM Z
     SLEEP 0.5
 
-    # Volver al Centro Pokemon (subir)
+    # Volver al Centro Pokemon (subir hasta ver la puerta)
     HOLD UP
     WAITFOR center
     SLEEP 1

@@ -6,8 +6,15 @@
 #   - NO necesita HMs
 #
 # Flujo:
-#   setup -> ir al centro a curar
-#   loop  -> salir a Route 3 (este), caminar en hierba, ganar batalla, volver al centro
+#   setup -> entrar al centro a curar
+#   loop  -> salir, ir a Route 3, WALK en hierba (detecta batalla auto),
+#            ganar batalla, volver al centro
+#
+# Config relevante (config.toml):
+#   [battle] MOVE_SLOT = slot del movimiento a usar
+#   [walk]   PATTERN = patron de movimiento (zigzag, circle, random...)
+#   [walk]   STEP_DURATION = duracion de cada paso
+#   [walk]   STEPS = numero de pasos por ciclo
 
 setup:
     PRINT esperando_2_segundos
@@ -33,73 +40,32 @@ loop:
     PRESS Z
     SLEEP 1.5
 
-    # Salir del centro y ir a Route 3 (al este de Striaton)
+    # Salir del centro
     HOLD DOWN
     SLEEP 1.0
     RELEASE DOWN
     SLEEP 0.3
 
+    # Ir al este hacia Route 3
     HOLD RIGHT
     SLEEP 4.0
     RELEASE RIGHT
     SLEEP 0.3
 
-    # Entrar en la hierba de Route 3 y hacer zigzag
-    HOLD RIGHT
-    SLEEP 1.0
-    RELEASE RIGHT
-    SLEEP 0.2
+    # Caminar en hierba con patron configurable
+    # Si encuentra batalla durante el WALK, la maneja automaticamente
+    WALK zigzag
 
-    HOLD DOWN
-    SLEEP 0.8
-    RELEASE DOWN
-    SLEEP 0.2
-
-    HOLD RIGHT
-    SLEEP 1.0
-    RELEASE RIGHT
-    SLEEP 0.2
-
-    HOLD UP
-    SLEEP 0.8
-    RELEASE UP
-    SLEEP 0.2
-
-    HOLD RIGHT
-    SLEEP 1.0
-    RELEASE RIGHT
-    SLEEP 0.2
-
-    HOLD DOWN
-    SLEEP 0.8
-    RELEASE DOWN
-    SLEEP 0.2
-
-    HOLD LEFT
-    SLEEP 1.0
-    RELEASE LEFT
-    SLEEP 0.2
-
-    HOLD UP
-    SLEEP 0.8
-    RELEASE UP
-    SLEEP 0.2
-
-    # Ganar la batalla con spam Z
+    # Si no hubo batalla durante el WALK, esperar una
     WAITFOR lotta
-    PRESS Z
-    SLEEP 0.5
-    PRESS Z
-    SLEEP 0.5
-    PRESS Z
     SPAM Z
     WAITFOR terrain
     STOPSPAM Z
     SLEEP 0.8
 
-    # Volver al Centro Pokemon de Striaton (al oeste)
+    # Volver al Centro Pokemon (oeste largo + subir hasta ver puerta)
     HOLD LEFT
-    SLEEP 5.5
+    SLEEP 8
     RELEASE LEFT
     SLEEP 0.3
 

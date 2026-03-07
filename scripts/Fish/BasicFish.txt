@@ -1,0 +1,24 @@
+# Script: Pesca basica
+# Requisitos:
+#   - Posicion inicial: frente al agua, mirando hacia ella
+#   - Cana de pescar equipada en slot de la tecla ROD_KEY (config.toml)
+#   - Pokemon con False Swipe recomendado (para auto-catch)
+#   - Ref necesaria: refs/excl.png (icono "!" de picada)
+#
+# Flujo:
+#   loop -> lanzar cana, esperar picada, enganchar, pelear/capturar
+#
+# Config relevante (config.toml):
+#   [controls] ROD_KEY = tecla de la cana (default: 4)
+#   [battle]   AUTO_CATCH = true para capturar automaticamente
+#   [battle]   MOVE_SLOT = movimiento a usar (False Swipe recomendado)
+
+setup:
+    PRINT iniciando_pesca_espera_3_segundos
+    SLEEP 3
+
+loop:
+    # Lanzar cana de pescar
+    FISH 4
+
+    SLEEP 1

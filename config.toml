@@ -2,20 +2,51 @@
 STARTDIR = "./"
 
 [ bot ]
-# Script activo al ejecutar python src/main.py
-# Opciones:
-#   ./scripts/Exp/Route3_Striaton.txt     <- Ruta 3 desde Striaton (actual)
-#   ./scripts/Exp/Route2_EarlyUnova.txt   <- Ruta 2 desde Accumula
-#   ./scripts/Exp/Spiraria.txt            <- Spiraria (requiere Surf)
 SCRIPT = "./scripts/Exp/Route3_Striaton.txt"
+# Modo de operacion: "script" (normal) o "agent" (IA, para VPS)
+MODE = "script"
 
 [ game ]
-# Resolucion del juego - NO cambiar, las refs estan calibradas para esto
 RESOLUTION_W = 1920
 RESOLUTION_H = 1080
+WINDOW_TITLE = "PokeMMO"
 
 [ controls ]
-# Tecla de accion principal (A) - debe coincidir con la config del juego
 ACTION_KEY = "z"
-# Tecla Surf / HM (solo para script Spiraria)
+BACK_KEY = "x"
 SURF_KEY = "j"
+ROD_KEY = "4"
+
+[ battle ]
+MOVE_SLOT = 1
+AUTO_CATCH = false
+# Batallas antes de volver al centro a curar
+# RedTrainer cura solo con HP bajo — nosotros hacemos N batallas y curamos
+# 1 = curar cada batalla (seguro, lento), 5 = cada 5 (rapido, arriesgado)
+BATTLES_PER_HEAL = 5
+
+[ walk ]
+PATTERN = "zigzag"
+STEP_DURATION = 1.5
+STEPS = 6
+
+[ safety ]
+WAITFOR_TIMEOUT = 120
+SLEEP_JITTER = 0.2
+AUTO_FOCUS = true
+# Pausa aleatoria larga cada N loops (anti-deteccion)
+# 0 = desactivado. Ej: 10 = cada 10 loops, pausa de 30-120s
+AFK_PAUSE_EVERY = 0
+# Duracion maxima de sesion en minutos (0 = ilimitado)
+SESSION_MAX_MINUTES = 0
+
+[ ai ]
+# Modo agente IA — usa Claude API para analizar screenshots del juego
+# Requiere ANTHROPIC_API_KEY en variable de entorno
+ENABLED = false
+# Modelo a usar (haiku = barato y rapido, sonnet = mejor pero mas caro)
+MODEL = "claude-haiku-4-5-20251001"
+# Intervalo entre analisis IA en segundos (mas bajo = mas caro)
+CHECK_INTERVAL = 10
+# Usar IA para decidir cuando curar (lee HP del screenshot)
+AI_HP_CHECK = true

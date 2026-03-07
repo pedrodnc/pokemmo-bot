@@ -1,3 +1,8 @@
 PyAutoGUI==0.9.53
 pynput==1.7.6
 toml==0.10.2
+opencv-python>=4.5.0
+Pillow>=9.0.0
+
+# Opcional: modo agente IA (requiere ANTHROPIC_API_KEY)
+# anthropic>=0.40.0

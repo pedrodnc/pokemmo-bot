@@ -3,93 +3,122 @@
 ## Qué es esto
 
 Bot de farming automático para PokéMMO (cliente MMO basado en Pokémon Gen 3-5).
-Fork de [caamillo/alphaForny](https://github.com/caamillo/alphaForny) con scripts adicionales para Unova early game.
+Fork de [caamillo/alphaForny](https://github.com/caamillo/alphaForny) con mejoras inspiradas en [RedTrainer](https://github.com/yzsvdu/RedTrainer) pero sin inyección — 100% externo (image recognition + input simulation).
 
 ## Arquitectura
 
 ```
 src/
-  main.py           → Entrada. Carga config, selecciona script, arranca AlphaForny
-  AlphaForny.py     → Clase principal. Gestiona threads (ejecución + input listener)
-  FornyTranslator.py → Parsea los scripts .txt y traduce comandos a acciones
-  Action.py         → Ejecuta acciones reales: teclado, ratón, image recognition
-  Config.py         → Lee config.toml
-  Script.py         → Navegador de scripts en menú interactivo
-  Language.py       → i18n (en.json / it.json)
+  main.py            → Entrada. Carga config, selecciona script, arranca AlphaForny
+  AlphaForny.py      → Clase principal. Gestiona threads (ejecución + input listener)
+  FornyTranslator.py → Parsea scripts .txt, traduce comandos a acciones, maneja batalla
+  Action.py          → Ejecuta acciones: teclado, ratón, image recognition, auto-focus
+  BattleHandler.py   → Logica de batalla: seleccion de movimiento, auto-catch
+  Config.py          → Lee config.toml
+  Translator.py      → Clase Translator: acceso a strings i18n con notación dot
+  Script.py          → Navegador de scripts en menú interactivo
+  Language.py        → i18n (en.json / it.json)
 
 scripts/
   Exp/
     Route3_Striaton.txt    → Farm early Unova (Striaton City → Route 3) ← ACTIVO
     Route2_EarlyUnova.txt  → Farm early Unova (Accumula Town → Route 2)
     Spiraria.txt           → Farm mid-late (requiere HM Surf)
-  Gym/Unima/
-    All.txt                → Gym rematch Unova (vacío, sin implementar)
-    Levantopoli.txt        → Gym rematch Castelia (vacío)
-  EVs/Unima/               → Scripts de EV training (no incluidos en este fork)
+  Fish/
+    BasicFish.txt          → Pesca basica (requiere refs/excl.png)
+  Gym/Unima/               → Gym rematch (vacíos, sin implementar)
+  Custom/
+    AntiAFK.txt            → Anti-AFK (camina en cuadrado)
 
 refs/                      → Imágenes de referencia para image recognition (1920x1080)
-  center.png    → Puerta Centro Pokémon
-  lotta.png     → Pantalla de inicio de batalla
-  arrow.png     → Flecha de diálogo (▶)
-  yesno.png     → Menú Sí/No
-  terrain.png   → Mapa (sin batalla)
-  mare.png      → Agua en el mapa
-  sassi.png     → Roca de referencia (Spiraria)
-  sassi2.png    → Roca de referencia 2 (Spiraria)
-  hp.png        → Barra de HP
-  dialogue.png  → Cuadro de diálogo genérico
-  duesassi.png  → Dos rocas (Spiraria)
 ```
 
-## Cómo funciona el DSL de scripts
+## Cómo funciona
+
+### DSL de scripts
 
 Los scripts .txt tienen dos secciones: `setup:` (se ejecuta una vez) y `loop:` (bucle infinito).
 
-Comandos disponibles:
+Comandos:
 ```
 PRESS <key>           → Pulsa y suelta una tecla
 HOLD <key>            → Mantiene pulsada una tecla
 RELEASE <key>         → Suelta una tecla
-SLEEP <segundos>      → Espera N segundos (acepta decimales)
-WAITFOR <ref>         → Espera hasta detectar refs/<ref>.png en pantalla
+SLEEP <segundos>      → Espera N segundos (con jitter aleatorio ±20%)
+WAITFOR <ref>         → Espera hasta detectar refs/<ref>.png en pantalla (timeout 120s)
 UNTIL <ref>           → Espera hasta que refs/<ref>.png DEJE de aparecer
 SPAM <key>            → Empieza a spamear una tecla en background thread
 STOPSPAM <key>        → Para el spam
 CLICK <x>,<y>         → Click de ratón en coordenadas absolutas
 PRINT <texto>         → Log en consola
+WALK <patron>         → Movimiento con patron configurable (zigzag/circle/random/leftright/updown)
+FISH <tecla_cana>     → Ciclo de pesca: lanzar cana → esperar picada → enganchar → pelear
 ```
 
 Teclas especiales: UP, DOWN, LEFT, RIGHT, SHIFT. El resto son caracteres literales (z, x, j...).
 
-## Estado actual
+### Detección de batalla mid-walk
 
-- Script activo: `Route3_Striaton.txt`
-- Región: Unova
-- Punto de inicio: Centro Pokémon de Striaton City (1er gym)
-- Requiere: Python 3.10+, resolución 1920x1080, controles A=Z B=X flechas
+Durante cualquier `SLEEP >= 0.5s` o `WALK`, el bot checkea cada 0.5s si aparece la pantalla de batalla (`lotta.png`). Si la detecta:
+1. Suelta todas las teclas de movimiento
+2. Ejecuta la batalla (selección de movimiento configurable + spam para diálogos)
+3. Marca `battle_handled = True` → salta los WAITFOR/SPAM/STOPSPAM del script
+4. Continúa con la vuelta al centro
 
-## Limitaciones conocidas
+### BattleHandler
 
-1. **Image recognition frágil**: Las refs están calibradas para la pantalla del autor original. Si la resolución, zoom o idioma del juego difiere, los WAITFOR se cuelgan indefinidamente.
-2. **Timing fijo**: Los SLEEP están hardcodeados. Si el PC es lento o el servidor tiene lag, el personaje puede desincronizarse del camino esperado.
-3. **Sin detección de HP**: El bot no detecta cuándo el Pokémon está débil — confía en que el loop de curación en el Centro funcione a tiempo.
-4. **Sin anti-ban**: Los delays son fijos y predecibles. Para uso prolongado, añadir variación aleatoria en los SLEEP.
+Maneja la lógica de batalla basándose en config.toml:
+- `MOVE_SLOT`: qué movimiento usar (1-4, layout 2x2 del menú de batalla)
+- `AUTO_CATCH`: si true, intenta lanzar Pokeball antes de pelear
 
-## Mejoras prioritarias
+### Auto-focus (Windows)
 
-Si trabajas en este proyecto, estas son las mejoras más útiles por orden:
+El bot trae la ventana de PokéMMO al frente automáticamente al arrancar y antes de cada acción importante. Configurable con `AUTO_FOCUS` en config.toml.
 
-1. **Delays aleatorios**: Cambiar `SLEEP 1.5` por `SLEEP random(1.2, 1.8)` en FornyTranslator
-2. **Detección de HP crítico**: Usar `WAITFOR hp` para detectar HP bajo y forzar vuelta al centro antes del loop normal
-3. **Config de keybinds en config.toml**: Que Action.py lea las teclas de config en vez de estar hardcodeadas
-4. **Timeout en WAITFOR**: Si tarda más de N segundos, reiniciar desde el centro en vez de colgarse
-5. **Logging de sesión**: Guardar XP/hora, batallas ganadas, tiempo total
+## Config (config.toml)
+
+```toml
+[battle]
+MOVE_SLOT = 1          # Slot del movimiento (1-4)
+AUTO_CATCH = false     # Intentar capturar
+
+[walk]
+PATTERN = "zigzag"     # zigzag, circle, random, leftright, updown
+STEP_DURATION = 1.5    # Segundos por paso
+STEPS = 6              # Pasos por ciclo
+
+[safety]
+WAITFOR_TIMEOUT = 120  # Timeout WAITFOR en segundos
+SLEEP_JITTER = 0.2     # Variación aleatoria ±20%
+AUTO_FOCUS = true      # Traer ventana al frente
+```
 
 ## Setup en Windows
 
 ```bat
-setup_windows.bat   # instala deps
-python src/main.py  # ejecuta el bot
+pip install -r requirements.txt
+python src/main.py
 ```
 
-Ver `README_WINDOWS.md` para instrucciones completas.
+Requisitos: Python 3.10+, resolución 1920x1080, PokéMMO en ventana.
+
+## Features vs RedTrainer
+
+| Feature | RedTrainer (inyección) | Este bot (externo) |
+|---|---|---|
+| Selección de movimiento | Reflection directa | Config MOVE_SLOT (1-4) |
+| Auto-catch | Reflection directa | Image recognition + nav menú |
+| Walk patterns | Circle/Random/LR/UD | WALK command (mismos patrones) |
+| Auto-fish | Reflection directa | FISH command + refs/excl.png |
+| Sin foco (background) | Java Reflection | NO — necesita foco (auto-focus) |
+| Detección HP | Lee memoria del juego | NO — pendiente (pixel reading) |
+| Anti-detección | Ninguno | SLEEP jitter ±20% |
+| Se rompe con updates | Sí (reflection names) | No (image recognition) |
+| Riesgo de ban | Alto (inyección) | Bajo (solo simula input) |
+
+## Limitaciones
+
+1. **Necesita foco** — La ventana de PokéMMO debe estar activa. Auto-focus lo maneja, pero no puedes usar el PC para otra cosa.
+2. **Image recognition frágil** — Las refs están calibradas para 1920x1080. Otra resolución/idioma/zoom = recapturar refs.
+3. **Sin detección de HP** — No detecta HP bajo ni whiteout. Si el Pokemon se debilita, el bot puede desincronizarse.
+4. **Sin detección de PP** — Si se acaban los PP, usa Struggle y se daña a sí mismo.

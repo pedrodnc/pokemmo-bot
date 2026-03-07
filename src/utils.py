@@ -32,4 +32,4 @@ class Clear:
 
     def clearScreen(self):
         if self.toggled:
-            os.system(self.cmd['general']['clear'])
+            os.system(cmd['general']['clear'])
